@@ -1,0 +1,30 @@
+name: Download Whisper Large-V3-Turbo Model
+
+on:
+  workflow_dispatch:
+
+jobs:
+  download:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download Turbo model (1.6GB)
+        run: |
+          echo "Downloading Whisper Large-V3-Turbo model..."
+          curl -L -o model.bin "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-large-v3-turbo.bin"
+          ls -lh model.bin
+
+      - name: Create models directory
+        run: mkdir -p models
+
+      - name: Move model
+        run: mv model.bin ./models/
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: whisper-turbo-model
+          path: ./models/model.bin
+          retention-days: 30
