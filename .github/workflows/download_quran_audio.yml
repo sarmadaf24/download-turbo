@@ -1,48 +1,13 @@
-name: 01-Abdul_Basit_Mujawwad_128kbps
+name: پیدا کردن ZIP عبدالباسط
 on: workflow_dispatch
 jobs:
-  download:
+  find-zip:
     runs-on: ubuntu-latest
     steps:
-      - name: نصب ابزارها
-        run: sudo apt-get update && sudo apt-get install -y zip curl
-        
-      - name: دانلود سوره‌های عبدالباسط تجوید
-        run: |
-          mkdir -p "Abdul_Basit_Mujawwad_128kbps"
-          cd "Abdul_Basit_Mujawwad_128kbps"
-          
-          # دانلود هر 114 سوره به صورت فایل کامل (merged)
-          for s in {001..114}; do
-            URL="https://everyayah.com/data/Abdul_Basit_Mujawwad_128kbps/merged/${s}.mp3"
-            echo "🔄 در حال دانلود سوره $s..."
-            curl -L --fail --progress-bar -o "${s}.mp3" "$URL"
-            
-            # بررسی حجم فایل (باید بیشتر از 500KB باشه)
-            SIZE=$(stat -c%s "${s}.mp3" 2>/dev/null || echo "0")
-            if [ "$SIZE" -gt "500000" ]; then
-              SIZE_MB=$((SIZE / 1048576))
-              echo "✅ سوره $s دانلود شد (${SIZE_MB} MB)"
-            else
-              echo "❌ سوره $s مشکل دارد (حجم: $SIZE bytes)"
-              rm -f "${s}.mp3"
-            fi
-          done
+      - run: |
+          echo "🔍 بررسی پوشه zips:"
+          curl -L "https://everyayah.com/data/Abdul_Basit_Mujawwad_128kbps/zips/" 2>/dev/null | grep -E 'href=".*\.zip"'
           
           echo ""
-          echo "📊 خلاصه دانلود:"
-          ls -lh *.mp3 | wc -l
-          
-      - name: زیپ کردن فایل‌ها
-        run: |
-          cd "Abdul_Basit_Mujawwad_128kbps"
-          zip -r "../Abdul_Basit_Mujawwad_128kbps.zip" .
-          cd ..
-          echo "📦 حجم فایل ZIP نهایی: $(du -h Abdul_Basit_Mujawwad_128kbps.zip | cut -f1)"
-          
-      - name: آپلود Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: "Abdul_Basit_Mujawwad_128kbps"
-          path: "Abdul_Basit_Mujawwad_128kbps.zip"
-          retention-days: 90
+          echo "🔍 بررسی کل پوشه اصلی:"
+          curl -L "https://everyayah.com/data/Abdul_Basit_Mujawwad_128kbps/" 2>/dev/null | grep -E 'href=".*\.zip"'
