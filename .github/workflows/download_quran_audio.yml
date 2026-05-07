@@ -1,51 +1,52 @@
-name: دانلود تلاوت‌های قرآن از everyayah.com
+name: دانلود تلاوت‌های قرآن (نسخه پایدار)
 
 on:
-  workflow_dispatch:  # اجرای دستی از طریق GitHub UI
+  workflow_dispatch:  # اجرای دستی
 
 jobs:
   download-qaris:
     runs-on: ubuntu-latest
     strategy:
-      fail-fast: false
+      fail-fast: false  # جلوگیری از توقف کل فرآیند در صورت خطای یکی
       matrix:
         qari: [
-          # قاریان اصلی (بر اساس لیست شما)
-          {name: "Abdul Basit Murattal", style: "", bitrate: "192", folder: "Abdul_Basit_Murattal_192kbps"},
-          {name: "Abdul Basit Mujawwad", style: "", bitrate: "128", folder: "Abdul_Basit_Mujawwad_128kbps"},
-          {name: "Abdullah Basfar", style: "", bitrate: "192", folder: "Abdullah_Basfar_192kbps"},
-          {name: "AbdulSamad", style: "", bitrate: "64", folder: "AbdulSamad_64kbps"},
-          {name: "Abdullaah 3awwaad Al-Juhaynee", style: "", bitrate: "128", folder: "Abdullaah_3awwaad_Al-Juhaynee_128kbps"},
-          {name: "Abdullah Matroud", style: "", bitrate: "128", folder: "Abdullah_Matroud_128kbps"},
-          {name: "Abdurrahmaan As-Sudais", style: "", bitrate: "192", folder: "Abdurrahmaan_As-Sudais_192kbps"},
-          {name: "Abu Bakr Ash-Shaatree", style: "", bitrate: "128", folder: "Abu_Bakr_Ash-Shaatree_128kbps"},
-          {name: "Ahmed Neana", style: "", bitrate: "128", folder: "Ahmed_Neana_128kbps"},
-          {name: "Ali Jaber", style: "", bitrate: "64", folder: "Ali_Jaber_64kbps"},
-          {name: "Aziz Alili", style: "", bitrate: "128", folder: "Aziz_Alili_128kbps"},
-          {name: "Hani Rifai", style: "", bitrate: "192", folder: "Hani_Rifai_192kbps"},
-          {name: "Hudhaify", style: "", bitrate: "128", folder: "Hudhaify_128kbps"},
-          {name: "Husary", style: "Murattal", bitrate: "128", folder: "Husary_Murattal_128kbps"},
-          {name: "Husary", style: "Mujawwad", bitrate: "128", folder: "Husary_Mujawwad_128kbps"},
-          {name: "Husary", style: "Muallim", bitrate: "128", folder: "Husary_Muallim_128kbps"},
-          {name: "Ibrahim Akhdar", style: "", bitrate: "64", folder: "Ibrahim_Akhdar_64kbps"},
-          {name: "Mahmoud Ali Al-Banna", style: "", bitrate: "32", folder: "Mahmoud_Ali_Al-Banna_32kbps"},
-          {name: "Minshawy", style: "Mujawwad", bitrate: "192", folder: "Minshawy_Mujawwad_192kbps"},
-          {name: "Minshawy", style: "Murattal", bitrate: "128", folder: "Minshawy_Murattal_128kbps"},
-          {name: "Mohammad al Tablaway", style: "", bitrate: "128", folder: "Mohammad_al_Tablaway_128kbps"},
-          {name: "Muhammad AbdulKareem", style: "", bitrate: "128", folder: "Muhammad_AbdulKareem_128kbps"},
-          {name: "Muhammad Ayyoub", style: "", bitrate: "128", folder: "Muhammad_Ayyoub_128kbps"},
-          {name: "Muhammad Jibreel", style: "", bitrate: "128", folder: "Muhammad_Jibreel_128kbps"},
-          {name: "Muhsin Al Qasim", style: "", bitrate: "192", folder: "Muhsin_Al_Qasim_192kbps"},
-          {name: "Mustafa Ismail", style: "", bitrate: "48", folder: "Mustafa_Ismail_48kbps"},
-          {name: "Sahl Yassin", style: "", bitrate: "128", folder: "Sahl_Yassin_128kbps"},
-          {name: "Salah Al Budair", style: "", bitrate: "128", folder: "Salah_Al_Budair_128kbps"},
-          {name: "Salaah AbdulRahman Bukhatir", style: "", bitrate: "128", folder: "Salaah_AbdulRahman_Bukhatir_128kbps"},
-          # قرائت‌های ورش
-          {name: "Abdul Basit Warsh", style: "", bitrate: "128", folder: "Abdul_Basit_Warsh_128kbps"},
-          {name: "Ibrahim Al-Dosary Warsh", style: "", bitrate: "128", folder: "Ibrahim_Al-Dosary_Warsh_128kbps"},
-          {name: "Yassin Al-Jazaery Warsh", style: "", bitrate: "64", folder: "Yassin_Al-Jazaery_Warsh_64kbps"}
+          # ---------- عبدالباسط ----------
+          {name: "Abdul_Basit_Murattal_192kbps",   display: "Abdul_Basit_Murattal_192kbps"},
+          {name: "Abdul_Basit_Mujawwad_128kbps",  display: "Abdul_Basit_Mujawwad_128kbps"},
+          
+          # ---------- دیگر قاریان اصلی (با نام پوشه دقیق از سایت) ----------
+          {name: "Abdullah_Basfar_192kbps",        display: "Abdullah_Basfar_192kbps"},
+          {name: "AbdulSamad_64kbps_QuranExplorer.Com", display: "AbdulSamad_QuranExplorer_64kbps"},
+          {name: "Abdullaah_3awwaad_Al-Juhaynee_128kbps", display: "Al-Juhaynee_128kbps"},
+          {name: "Abdullah_Matroud_128kbps",       display: "Abdullah_Matroud_128kbps"},
+          {name: "Abdurrahmaan_As-Sudais_192kbps", display: "Sudais_192kbps"},
+          {name: "Abu_Bakr_Ash-Shaatree_128kbps", display: "Ash-Shaatree_128kbps"},
+          {name: "Ahmed_Neana_128kbps",            display: "Ahmed_Neana_128kbps"},
+          {name: "Ali_Jaber_64kbps",               display: "Ali_Jaber_64kbps"},
+          {name: "Aziz_Alili_128kbps",             display: "Aziz_Alili_128kbps"},
+          {name: "Hani_Rifai_192kbps",             display: "Hani_Rifai_192kbps"},
+          {name: "Hudhaify_128kbps",               display: "Hudhaify_128kbps"},
+          {name: "Husary_128kbps",                 display: "Husary_Murattal_128kbps"},
+          {name: "Husary_128kbps_Mujawwad",        display: "Husary_Mujawwad_128kbps"},
+          {name: "Husary_Muallim_128kbps",         display: "Husary_Muallim_128kbps"},
+          {name: "Ibrahim_Akhdar_64kbps",          display: "Ibrahim_Akhdar_64kbps"},
+          {name: "Mahmoud_Ali_Al-Banna_32kbps",    display: "Al-Banna_32kbps"},  # نام دقیق از دایرکتوری
+          {name: "Minshawy_Mujawwad_192kbps",      display: "Minshawy_Mujawwad_192kbps"},
+          {name: "Minshawy_Murattal_128kbps",      display: "Minshawy_Murattal_128kbps"},
+          {name: "Mohammad_al_Tablaway_128kbps",   display: "Tablaway_128kbps"},
+          {name: "Muhammad_AbdulKareem_128kbps",   display: "AbdulKareem_128kbps"},
+          {name: "Muhammad_Ayyoub_128kbps",        display: "Muhammad_Ayyoub_128kbps"},
+          {name: "Muhammad_Jibreel_128kbps",       display: "Jibreel_128kbps"},
+          {name: "Muhsin_Al_Qasim_192kbps",        display: "Muhsin_Al_Qasim_192kbps"},
+          {name: "Mustafa_Ismail_48kbps",          display: "Mustafa_Ismail_48kbps"},
+          {name: "Sahl_Yassin_128kbps",            display: "Sahl_Yassin_128kbps"},
+          {name: "Salah_Al_Budair_128kbps",        display: "Salah_Al_Budair_128kbps"},
+          {name: "Salaah_AbdulRahman_Bukhatir_128kbps", display: "Bukhatir_128kbps"},
+          
+          # ---------- قرائت ورش ----------
+          {name: "Abdul_Basit_Murattal_192kbps",   display: "Abdul_Basit_Warsh_192kbps", isWarsh: true},
+          # برای ورش باید پوشه را جداگانه بررسی کنید. در دایرکتوری 'warsh' هستند.
         ]
-
     steps:
       - name: آماده‌سازی محیط
         run: |
@@ -54,35 +55,47 @@ jobs:
 
       - name: ایجاد دایرکتوری موقت
         run: |
-          mkdir -p "${{ matrix.qari.name }}"
-          cd "${{ matrix.qari.name }}"
+          mkdir -p "${{ matrix.qari.display }}"
+          cd "${{ matrix.qari.display }}"
 
       - name: دانلود فایل‌های MP3
         run: |
-          TARGET_DIR="${{ matrix.qari.name }}"
-          BASE_URL="https://everyayah.com/data/${{ matrix.qari.folder }}/"
+          TARGET_DIR="${{ matrix.qari.display }}"
+          # ساخت آدرس پایه: اگر isWarsh=true باشد، آدرس تغییر می‌کند.
+          if [ "${{ matrix.qari.isWarsh }}" = "true" ]; then
+            BASE_URL="https://everyayah.com/data/warsh/${{ matrix.qari.name }}/"
+          else
+            BASE_URL="https://everyayah.com/data/${{ matrix.qari.name }}/"
+          fi
+          
           echo "در حال دانلود از $BASE_URL"
           
+          # حلقه دانلود سوره‌ها
           for sura in {001..114}; do
             URL="${BASE_URL}${sura}.mp3"
             OUTPUT="${TARGET_DIR}/${sura}.mp3"
+            
+            # استفاده از -L برای دنبال کردن ریدایرکت، -f برای خطا در صورت فیلد بودن
             HTTP_CODE=$(curl -L --fail --silent --output "$OUTPUT" --write-out "%{http_code}" "$URL")
+            
             if [ "$HTTP_CODE" = "200" ]; then
-              echo "✅ دانلود سوره $sura"
+              echo "✅ دانلود سوره $sura انجام شد"
             else
-              echo "⚠️ سوره $sura موجود نیست (کد $HTTP_CODE)"
-              rm -f "$OUTPUT"
+              echo "⚠️ سوره $sura یافت نشد (کد $HTTP_CODE) - نادیده گرفته شد"
+              rm -f "$OUTPUT"  # حذف فایل خالی
             fi
           done
 
       - name: زیپ کردن فایل‌های دانلود شده
         run: |
-          zip -r "${{ matrix.qari.name }}.zip" "${{ matrix.qari.name }}/"
-          echo "حجم فایل زیپ: $(du -h ${{ matrix.qari.name }}.zip | cut -f1)"
+          cd "${{ matrix.qari.display }}"
+          zip -r "../${{ matrix.qari.display }}.zip" .
+          cd ..
+          echo "📦 فایل ZIP ساخته شد: $(du -h ${{ matrix.qari.display }}.zip | cut -f1)"
 
-      - name: بارگذاری به عنوان Artifact
+      - name: آپلود به عنوان Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: "${{ matrix.qari.name }}_${{ matrix.qari.style }}_${{ matrix.qari.bitrate }}kbps"
-          path: "${{ matrix.qari.name }}.zip"
+          name: "${{ matrix.qari.display }}"
+          path: "${{ matrix.qari.display }}.zip"
           retention-days: 90
