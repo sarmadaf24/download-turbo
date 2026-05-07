@@ -1,49 +1,18 @@
-name: عبدالباسط تجوید - دانلود هر سوره جداگانه
+name: 02-Abdul_Basit_Mujawwad_128kbps
 on: workflow_dispatch
 jobs:
   download:
     runs-on: ubuntu-latest
     steps:
-      - run: sudo apt-get update && sudo apt-get install -y zip curl unzip
-        
-      - name: دانلود همه سوره‌ها به صورت ZIP
-        run: |
-          mkdir -p "Abdul_Basit_Mujawwad_128kbps"
-          cd "Abdul_Basit_Mujawwad_128kbps"
-          
-          # دانلود 114 فایل ZIP (هر سوره یک ZIP)
+      - run: sudo apt-get update && sudo apt-get install -y zip curl
+      - run: |
+          mkdir -p "Abdul_Basit_Mujawwad_128kbps" && cd "Abdul_Basit_Mujawwad_128kbps"
           for s in {001..114}; do
-            URL="https://everyayah.com/data/Abdul_Basit_Mujawwad_128kbps/zips/${s}.zip"
-            echo "🔄 دانلود سوره $s..."
-            curl -L --progress-bar -o "${s}.zip" "$URL"
-            
-            # بررسی حجم (باید بیشتر از 1KB باشه)
-            SIZE=$(stat -c%s "${s}.zip" 2>/dev/null || echo "0")
-            if [ "$SIZE" -gt "1000" ]; then
-              SIZE_KB=$((SIZE / 1024))
-              echo "✅ سوره $s دانلود شد (${SIZE_KB} KB)"
-              # اکسترکت فایل‌های داخل ZIP
-              unzip -q "${s}.zip" -d "surah_${s}"
-              rm "${s}.zip"
-            else
-              echo "❌ سوره $s موجود نیست"
-              rm -f "${s}.zip"
-            fi
+            curl -L -o "Surah_${s}.zip" "https://everyayah.com/data/Abdul_Basit_Mujawwad_128kbps/zips/${s}.zip"
+            echo "✅ سوره $s"
           done
-          
-          echo ""
-          echo "📊 خلاصه:"
-          ls -la | head -20
-          
-      - name: زیپ کل مجموعه
-        run: |
-          cd "Abdul_Basit_Mujawwad_128kbps"
-          zip -r "../Abdul_Basit_Mujawwad_128kbps_Complete.zip" .
-          cd ..
-          echo "📦 حجم نهایی: $(du -h Abdul_Basit_Mujawwad_128kbps_Complete.zip | cut -f1)"
-          
+      - run: zip -r "../Abdul_Basit_Mujawwad_128kbps.zip" .
       - uses: actions/upload-artifact@v4
         with:
-          name: "Abdul_Basit_Mujawwad_128kbps_Complete"
-          path: "Abdul_Basit_Mujawwad_128kbps_Complete.zip"
-          retention-days: 90
+          name: "Abdul_Basit_Mujawwad_128kbps"
+          path: "Abdul_Basit_Mujawwad_128kbps.zip"
