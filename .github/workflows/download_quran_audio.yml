@@ -1,124 +1,122 @@
-name: دانلود تلاوت‌های قرآن از everyayah.com
+name: دانلود هوشمند و کامل تلاوت‌های قرآن
 
 on:
-  workflow_dispatch:  # اجرای دستی
+  workflow_dispatch:
 
 jobs:
-  download-qaris:
+  download-all-qaris:
     runs-on: ubuntu-latest
     strategy:
-      fail-fast: false  # ⬅️ کلیدی: اگر یک جاب خطا داد، بقیه متوقف نشن
-      max-parallel: 5    # تعداد جاب‌های همزمان، برای جلوگیری از قطعی
+      fail-fast: false         # اگر دانلود یک قاری خطا داد، بقیه متوقف نشوند
+      max-parallel: 3          # حداکثر 3 دانلود همزمان برای جلوگیری از قطعی
       matrix:
-        include:
-          # قاریانی که اسم پوشه آن‌ها را می‌دانیم و تست شده‌اند
-          - folder: "Abdul_Basit_Murattal_64kbps"      # کیفیت 64 کیلوبیت بر ثانیه
-            name: "Abdul_Basit_Murattal (64kbps)"
-          - folder: "Abdul_Basit_Murattal_192kbps"     # کیفیت 192 کیلوبیت بر ثانیه
-            name: "Abdul_Basit_Murattal (192kbps)"
-          - folder: "Abdul_Basit_Mujawwad_128kbps"
-            name: "Abdul_Basit_Mujawwad"
-          - folder: "Abdullah_Basfar_192kbps"
-            name: "Abdullah_Basfar"
-          - folder: "AbdulSamad_64kbps_QuranExplorer.Com"
-            name: "AbdulSamad (QuranExplorer.Com)"
-          - folder: "Abdullaah_3awwaad_Al-Juhaynee_128kbps"
-            name: "Abdullaah 3awwaad Al-Juhaynee"
-          - folder: "Abdullah_Matroud_128kbps"
-            name: "Abdullah Matroud"
-          - folder: "Abdurrahmaan_As-Sudais_192kbps"
-            name: "Abdurrahmaan As-Sudais"
-          - folder: "Abu_Bakr_Ash-Shaatree_128kbps"
-            name: "Abu Bakr Ash-Shaatree"
-          - folder: "Ahmed_Neana_128kbps"
-            name: "Ahmed Neana"
-          - folder: "Ali_Jaber_64kbps"
-            name: "Ali Jaber"
-          - folder: "Aziz_Alili_128kbps"
-            name: "Aziz Alili"
-          - folder: "Hani_Rifai_64kbps"
-            name: "Hani Rifai (64kbps)"
-          - folder: "Hani_Rifai_192kbps"
-            name: "Hani Rifai (192kbps)"
-          - folder: "Hudhaify_128kbps"
-            name: "Hudhaify"
-          - folder: "Husary_128kbps"
-            name: "Husary (Murattal)"
-          - folder: "Husary_128kbps_Mujawwad"          # مسیر مجود حسری
-            name: "Husary (Mujawwad)"
-          - folder: "Husary_Muallim_128kbps"           # مسیر معلم حسری
-            name: "Husary (Muallim)"
-          - folder: "Ibrahim_Akhdar_64kbps"
-            name: "Ibrahim Akhdar"
-          - folder: "Mahmoud_Ali_Al-Banna_32kbps"
-            name: "Mahmoud Ali Al-Banna"
-          - folder: "Minshawy_Mujawwad_192kbps"
-            name: "Minshawy (Mujawwad)"
-          - folder: "Minshawy_Murattal_128kbps"
-            name: "Minshawy (Murattal)"
-          - folder: "Mohammad_al_Tablaway_128kbps"
-            name: "Mohammad al Tablaway"
-          - folder: "Muhammad_AbdulKareem_128kbps"
-            name: "Muhammad AbdulKareem"
-          - folder: "Muhammad_Ayyoub_128kbps"
-            name: "Muhammad Ayyoub"
-          - folder: "Muhammad_Jibreel_128kbps"
-            name: "Muhammad Jibreel"
-          - folder: "Muhsin_Al_Qasim_192kbps"
-            name: "Muhsin Al Qasim"
-          - folder: "Mustafa_Ismail_48kbps"
-            name: "Mustafa Ismail"
-          - folder: "Sahl_Yassin_128kbps"
-            name: "Sahl Yassin"
-          - folder: "Salah_Al_Budair_128kbps"
-            name: "Salah Al Budair"
-          - folder: "Salaah_AbdulRahman_Bukhatir_128kbps"
-            name: "Salaah AbdulRahman Bukhatir"
-          # سبد ورش
-          - folder: "Abdul_Basit_Murattal_192kbps"      # برای ورش، اگر آدرس متفاوت است، بعداً اصلاح شود
-            name: "Abdul Basit (Warsh) - نیاز به بررسی آدرس"
-          - folder: "Ibrahim_Al-Dosary_128kbps"        # حدس برای ورش ابراهیم الدوسری
-            name: "Ibrahim Al-Dosary (Warsh)"
-          - folder: "Yassin_Al-Jazaery_Warsh_64kbps"
-            name: "Yassin Al-Jazaery (Warsh)"
+        qari-info: [
+          # 1. عبدالباسط (ترتیل با کیفیت 192 که در لیست شما اولویت دارد)
+          {name: "Abdul Basit - Murattal - 192kbps",    folder: "Abdul_Basit_Murattal_192kbps"},
+          # 2. عبدالباسط (مجود - فقط 128 موجود است)
+          {name: "Abdul Basit - Mujawwad - 128kbps",   folder: "Abdul_Basit_Mujawwad_128kbps"},
+          # 3. عبدالله بصفر (192 وجود دارد)
+          {name: "Abdullah Basfar - 192kbps",          folder: "Abdullah_Basfar_192kbps"},
+          # 4. عبدالصمد (بر اساس لیست شما 64)
+          {name: "AbdulSamad - 64kbps",                folder: "AbdulSamad_64kbps_QuranExplorer.Com"},
+          # 5. عبدالله الجهنی (128)
+          {name: "Abdullaah Al-Juhaynee - 128kbps",    folder: "Abdullaah_3awwaad_Al-Juhaynee_128kbps"},
+          # 6. عبدالله مطرود (128)
+          {name: "Abdullah Matroud - 128kbps",         folder: "Abdullah_Matroud_128kbps"},
+          # 7. سدیس (192 موجود است)
+          {name: "Abdurrahmaan As-Sudais - 192kbps",   folder: "Abdurrahmaan_As-Sudais_192kbps"},
+          # 8. ابوبکر شاطری (128)
+          {name: "Abu Bakr Ash-Shaatree - 128kbps",    folder: "Abu_Bakr_Ash-Shaatree_128kbps"},
+          # 9. احمد نعنا (128)
+          {name: "Ahmed Neana - 128kbps",              folder: "Ahmed_Neana_128kbps"},
+          # 10. علی جابر (بر اساس لیست شما 64)
+          {name: "Ali Jaber - 64kbps",                 folder: "Ali_Jaber_64kbps"},
+          # 11. عزیز علیلی (128)
+          {name: "Aziz Alili - 128kbps",               folder: "aziz_alili_128kbps"},
+          # 12. هانی ریفاعی (192 موجود است)
+          {name: "Hani Rifai - 192kbps",               folder: "Hani_Rifai_192kbps"},
+          # 13. حذیفی (128 موجود است)
+          {name: "Hudhaify - 128kbps",                 folder: "Hudhaify_128kbps"},
+          # 14. حسری - مرتل (128)
+          {name: "Husary - Murattal - 128kbps",        folder: "Husary_128kbps"},
+          # 15. حسری - مجود (128)
+          {name: "Husary - Mujawwad - 128kbps",        folder: "Husary_128kbps_Mujawwad"},
+          # 16. حسری - معلم (128)
+          {name: "Husary - Muallim - 128kbps",         folder: "Husary_Muallim_128kbps"},
+          # 17. ابراهیم اخضر (64 موجود است)
+          {name: "Ibrahim Akhdar - 64kbps",            folder: "Ibrahim_Akhdar_64kbps"},
+          # 18. محمود علی البنا (32) - تنها کیفیت موجود
+          {name: "Mahmoud Ali Al-Banna - 32kbps",      folder: "mahmoud_ali_al_banna_32kbps"},
+          # 19. منشاوی - مجود (192)
+          {name: "Minshawy - Mujawwad - 192kbps",      folder: "Minshawy_Mujawwad_192kbps"},
+          # 20. منشاوی - مرتل (128)
+          {name: "Minshawy - Murattal - 128kbps",      folder: "Minshawy_Murattal_128kbps"},
+          # 21. طبلاوی (128)
+          {name: "Mohammad al Tablaway - 128kbps",     folder: "Mohammad_al_Tablaway_128kbps"},
+          # 22. محمد عبدالکریم (128)
+          {name: "Muhammad AbdulKareem - 128kbps",     folder: "Muhammad_AbdulKareem_128kbps"},
+          # 23. محمد ایوب (128)
+          {name: "Muhammad Ayyoub - 128kbps",          folder: "Muhammad_Ayyoub_128kbps"},
+          # 24. محمد جبریل (128)
+          {name: "Muhammad Jibreel - 128kbps",         folder: "Muhammad_Jibreel_128kbps"},
+          # 25. محسن القاسم (192)
+          {name: "Muhsin Al Qasim - 192kbps",          folder: "Muhsin_Al_Qasim_192kbps"},
+          # 26. مصطفی اسماعیل (48)
+          {name: "Mustafa Ismail - 48kbps",            folder: "Mustafa_Ismail_48kbps"},
+          # 27. سهل یاسین (128)
+          {name: "Sahl Yassin - 128kbps",              folder: "Sahl_Yassin_128kbps"},
+          # 28. صلاح البدیر (128)
+          {name: "Salah Al Budair - 128kbps",          folder: "Salah_Al_Budair_128kbps"},
+          # 29. صلاح بخاتیر (128)
+          {name: "Salaah Bukhatir - 128kbps",          folder: "Salaah_AbdulRahman_Bukhatir_128kbps"},
+          # ---------- قرائت ورش ----------
+          # 30. عبدالباسط (ورش - 128) - در پوشه warsh
+          {name: "Abdul Basit - Warsh - 128kbps",      folder: "warsh/Abdul_Basit_Murattal_128kbps"},
+          # 31. ابراهیم الدوسری (ورش - 128) - بر اساس نام مشابه در پوشه warsh
+          {name: "Ibrahim Al-Dosary - Warsh - 128kbps",folder: "warsh/Ibrahim_Al-Dosary_128kbps"},
+          # 32. یاسین جزائری (ورش - 64) 
+          {name: "Yassin Al-Jazaery - Warsh - 64kbps", folder: "Yassin_Al-Jazaery_Warsh_64kbps"}
+        ]
 
     steps:
-      - name: آماده‌سازی محیط
+      - name: نصب ابزارها (curl, zip)
         run: |
           sudo apt-get update
           sudo apt-get install -y zip curl
 
-      - name: دانلود فایل‌های MP3 برای ${{ matrix.name }}
-        continue-on-error: true  # ⬅️ کلیدی: اگر این مرحله خطا داد، ادامه بده به مراحل بعدی همین جاب
+      - name: دانلود تلاوت‌های ${{ matrix.qari-info.name }}
         run: |
-          mkdir -p "${{ matrix.name }}"
-          cd "${{ matrix.name }}"
-          BASE_URL="https://everyayah.com/data/${{ matrix.folder }}/"
-          echo "در حال دانلود از $BASE_URL برای ${{ matrix.name }}"
+          # ساخت دایرکتوری موقت
+          mkdir -p "${{ matrix.qari-info.name }}"
+          cd "${{ matrix.qari-info.name }}"
+          
+          # آدرس پایه (برای ورش، مسیر متفاوت است چون شامل warsh/ می‌شود)
+          BASE_URL="https://everyayah.com/data/${{ matrix.qari-info.folder }}/"
+          echo "⏳ در حال دانلود از: $BASE_URL"
+          
+          # دانلود سوره‌های 001 تا 114 در صورت وجود
           for sura in {001..114}; do
             URL="${BASE_URL}${sura}.mp3"
-            OUTPUT="${sura}.mp3"
-            # --fail باعث می‌شود در صورت 404 خطا بدهد و ما آن را بگیریم
-            HTTP_CODE=$(curl -L --fail --silent --output "$OUTPUT" --write-out "%{http_code}" "$URL")
+            HTTP_CODE=$(curl -L --silent --fail --output "${sura}.mp3" --write-out "%{http_code}" "$URL")
             if [ "$HTTP_CODE" = "200" ]; then
-              echo "✅ دانلود سوره $sura"
+              echo "✅ سوره ${sura} دانلود شد."
             else
-              echo "⚠️ سوره $sura موجود نیست (کد $HTTP_CODE)"
-              rm -f "$OUTPUT"
+              # فایل خالی ناموجود را حذف کن
+              rm -f "${sura}.mp3"
             fi
           done
-
-      - name: زیپ کردن فایل‌های دانلود شده برای ${{ matrix.name }}
-        continue-on-error: true
-        run: |
-          cd "${{ matrix.name }}"
-          zip -r "../${{ matrix.name }}.zip" .
+          
+          # بازگشت به دایرکتوری اصلی
           cd ..
-          echo "📦 فایل ZIP ساخته شد: $(du -h ${{ matrix.name }}.zip | cut -f1)"
 
-      - name: آپلود فایل زیپ به عنوان Artifact برای ${{ matrix.name }}
+      - name: زیپ کردن فایل‌های ${{ matrix.qari-info.name }}
+        run: |
+          zip -r "${{ matrix.qari-info.name }}.zip" "${{ matrix.qari-info.name }}/"
+          echo "📦 فایل ZIP ساخته شد: $(du -h ${{ matrix.qari-info.name }}.zip | cut -f1)"
+
+      - name: آپلود Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: "${{ matrix.name }}"
-          path: "${{ matrix.name }}.zip"
+          name: "${{ matrix.qari-info.name }}"
+          path: "${{ matrix.qari-info.name }}.zip"
           retention-days: 90
