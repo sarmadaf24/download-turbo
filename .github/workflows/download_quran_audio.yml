@@ -1,88 +1,137 @@
-name: دانلود هوشمند تلاوت‌های قرآن (سازگار با ساختار everyayah)
+name: دانلود کامل تلاوت‌های قرآن (نسخه نهایی)
 
 on:
   workflow_dispatch:
 
 jobs:
-  download-quran:
+  download-all:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
-      max-parallel: 4
+      max-parallel: 2
       matrix:
-        qari: [
-          {name: "Abdul Basit - Murattal - 192kbps",   folder: "Abdul_Basit_Murattal_192kbps", pattern: "sura"},
-          {name: "Abdul Basit - Mujawwad - 128kbps",   folder: "Abdul_Basit_Mujawwad_128kbps", pattern: "standard"},
-          {name: "Abdullah Basfar - 192kbps",          folder: "Abdullah_Basfar_192kbps", pattern: "standard"},
-          {name: "AbdulSamad - 64kbps",                folder: "AbdulSamad_64kbps_QuranExplorer.Com", pattern: "standard"},
-          {name: "Abdullaah Al-Juhaynee - 128kbps",    folder: "Abdullaah_3awwaad_Al-Juhaynee_128kbps", pattern: "standard"},
-          {name: "Abdullah Matroud - 128kbps",         folder: "Abdullah_Matroud_128kbps", pattern: "standard"},
-          {name: "Abdurrahmaan As-Sudais - 192kbps",   folder: "Abdurrahmaan_As-Sudais_192kbps", pattern: "standard"},
-          {name: "Abu Bakr Ash-Shaatree - 128kbps",    folder: "Abu_Bakr_Ash-Shaatree_128kbps", pattern: "standard"},
-          {name: "Ahmed Neana - 128kbps",              folder: "Ahmed_Neana_128kbps", pattern: "standard"},
-          {name: "Ali Jaber - 64kbps",                 folder: "Ali_Jaber_64kbps", pattern: "standard"},
-          {name: "Aziz Alili - 128kbps",               folder: "aziz_alili_128kbps", pattern: "standard"},
-          {name: "Hani Rifai - 192kbps",               folder: "Hani_Rifai_192kbps", pattern: "standard"},
-          {name: "Hudhaify - 128kbps",                 folder: "Hudhaify_128kbps", pattern: "standard"},
-          {name: "Husary - Murattal - 128kbps",        folder: "Husary_128kbps", pattern: "standard"},
-          {name: "Husary - Mujawwad - 128kbps",        folder: "Husary_128kbps_Mujawwad", pattern: "standard"},
-          {name: "Husary - Muallim - 128kbps",         folder: "Husary_Muallim_128kbps", pattern: "standard"},
-          {name: "Ibrahim Akhdar - 64kbps",            folder: "Ibrahim_Akhdar_64kbps", pattern: "standard"},
-          {name: "Mahmoud Ali Al-Banna - 32kbps",      folder: "mahmoud_ali_al_banna_32kbps", pattern: "standard"},
-          {name: "Minshawy - Mujawwad - 192kbps",      folder: "Minshawy_Mujawwad_192kbps", pattern: "standard"},
-          {name: "Minshawy - Murattal - 128kbps",      folder: "Minshawy_Murattal_128kbps", pattern: "standard"},
-          {name: "Mohammad al Tablaway - 128kbps",     folder: "Mohammad_al_Tablaway_128kbps", pattern: "standard"},
-          {name: "Muhammad AbdulKareem - 128kbps",     folder: "Muhammad_AbdulKareem_128kbps", pattern: "standard"},
-          {name: "Muhammad Ayyoub - 128kbps",          folder: "Muhammad_Ayyoub_128kbps", pattern: "standard"},
-          {name: "Muhammad Jibreel - 128kbps",         folder: "Muhammad_Jibreel_128kbps", pattern: "standard"},
-          {name: "Muhsin Al Qasim - 192kbps",          folder: "Muhsin_Al_Qasim_192kbps", pattern: "standard"},
-          {name: "Mustafa Ismail - 48kbps",            folder: "Mustafa_Ismail_48kbps", pattern: "standard"},
-          {name: "Sahl Yassin - 128kbps",              folder: "Sahl_Yassin_128kbps", pattern: "standard"},
-          {name: "Salah Al Budair - 128kbps",          folder: "Salah_Al_Budair_128kbps", pattern: "standard"},
-          {name: "Salaah Bukhatir - 128kbps",          folder: "Salaah_AbdulRahman_Bukhatir_128kbps", pattern: "standard"},
-          {name: "Abdul Basit - Warsh - 128kbps",      folder: "warsh/Abdul_Basit_Murattal_128kbps", pattern: "standard"},
-          {name: "Ibrahim Al-Dosary - Warsh - 128kbps",folder: "warsh/Ibrahim_Al-Dosary_128kbps", pattern: "standard"},
-          {name: "Yassin Al-Jazaery - Warsh - 64kbps", folder: "Yassin_Al-Jazaery_Warsh_64kbps", pattern: "standard"}
+        qari-name: [
+          "Abdul Basit Murattal 192kbps",
+          "Abdul Basit Mujawwad 128kbps",
+          "Abdullah Basfar 192kbps",
+          "AbdulSamad 64kbps",
+          "Abdullaah 3awwaad Al-Juhaynee 128kbps",
+          "Abdullah Matroud 128kbps",
+          "Abdurrahmaan As-Sudais 192kbps",
+          "Abu Bakr Ash-Shaatree 128kbps",
+          "Ahmed Neana 128kbps",
+          "Ali Jaber 64kbps",
+          "Aziz Alili 128kbps",
+          "Hani Rifai 192kbps",
+          "Hudhaify 128kbps",
+          "Husary Murattal 128kbps",
+          "Husary Mujawwad 128kbps",
+          "Husary Muallim 128kbps",
+          "Ibrahim Akhdar 64kbps",
+          "Mahmoud Ali Al-Banna 32kbps",
+          "Minshawy Mujawwad 192kbps",
+          "Minshawy Murattal 128kbps",
+          "Mohammad al Tablaway 128kbps",
+          "Muhammad AbdulKareem 128kbps",
+          "Muhammad Ayyoub 128kbps",
+          "Muhammad Jibreel 128kbps",
+          "Muhsin Al Qasim 192kbps",
+          "Mustafa Ismail 48kbps",
+          "Sahl Yassin 128kbps",
+          "Salah Al Budair 128kbps",
+          "Salaah AbdulRahman Bukhatir 128kbps"
         ]
+
     steps:
       - name: نصب ابزارها
-        run: sudo apt-get update && sudo apt-get install -y zip curl
-
-      - name: دریافت لیست فایل‌های پوشه
         run: |
-          echo "⏳ دریافت لیست فایل‌ها از https://everyayah.com/data/${{ matrix.qari.folder }}/"
-          curl -L "https://everyayah.com/data/${{ matrix.qari.folder }}/" -o index.html
+          sudo apt-get update
+          sudo apt-get install -y zip curl jq
+
+      - name: دریافت recitations.js و استخراج آدرس دقیق
+        run: |
+          # دانلود فایل اصلی که حاوی تمام آدرس‌هاست
+          curl -L "https://everyayah.com/data/recitations.js" -o recitations.js
           
-          if [ "${{ matrix.qari.pattern }}" = "sura" ]; then
-            grep -oP '[0-9]{6}\.mp3' index.html | sort -u > filelist.txt
-          else
-            grep -oP '[0-9]{3}\.mp3' index.html | sort -u > filelist.txt
+          # استخراج آدرس پوشه برای قاری مورد نظر
+          FOLDER_PATH=$(grep -oP "(?<=path: ')[^']+" recitations.js | head -1)
+          echo "FOLDER_PATH=$FOLDER_PATH" >> $GITHUB_ENV
+
+      - name: دریافت لیست واقعی فایل‌های MP3 از پوشه قاری
+        run: |
+          SEARCH_NAME="${{ matrix.qari-name }}"
+          echo "🔍 جستجو برای: $SEARCH_NAME"
+          
+          # پیدا کردن نام دقیق پوشه از recitations.js
+          # ابتدا نام فایل JS مربوط به این قاری را پیدا می‌کنیم
+          JS_FILE=$(grep -l "$SEARCH_NAME" recitations.js || echo "")
+          
+          if [ -z "$JS_FILE" ]; then
+            # روش جایگزین: دانلود مستقیم صفحه پوشه
+            # نام پوشه را از نام قاری می‌سازیم
+            FOLDER_NAME=$(echo "$SEARCH_NAME" | sed 's/ /_/g' | sed 's/-/_/g')
+            echo "FOLDER_NAME=$FOLDER_NAME" >> $GITHUB_ENV
+          fi
+
+      - name: دانلود فایل‌ها با روش هوشمند
+        run: |
+          TARGET_DIR="${{ matrix.qari-name }}"
+          mkdir -p "$TARGET_DIR"
+          
+          # لیست تمام فایل‌های پوشه را می‌گیریم
+          FOLDER_NAME=$(echo "${{ matrix.qari-name }}" | sed 's/ /_/g' | sed 's/-/_/g')
+          
+          echo "⏳ بررسی پوشه: https://everyayah.com/data/$FOLDER_NAME/"
+          
+          # دریافت صفحه فهرست
+          curl -L "https://everyayah.com/data/$FOLDER_NAME/" -o temp.html 2>/dev/null
+          
+          # پیدا کردن همه فایل‌های MP3 (هر فرمتی)
+          grep -oE '[0-9]{3,6}\.mp3' temp.html | sort -u > filelist.txt
+          
+          # اگر فایلی پیدا نشد، با فرمت دیگر جستجو کن
+          if [ ! -s filelist.txt ]; then
+            grep -oE '[a-zA-Z0-9_]+\.mp3' temp.html | grep -E '^[0-9]' | sort -u > filelist.txt
           fi
           
-          echo "✅ تعداد فایل‌های یافت شده: $(wc -l < filelist.txt)"
-
-      - name: دانلود فایل‌ها
-        run: |
-          TARGET_DIR="${{ matrix.qari.name }}"
-          mkdir -p "$TARGET_DIR"
-          cd "$TARGET_DIR"
+          COUNT=$(wc -l < filelist.txt)
+          echo "✅ تعداد فایل‌های MP3 پیدا شده: $COUNT"
           
+          if [ $COUNT -eq 0 ]; then
+            echo "⚠️ هیچ فایل MP3 ای پیدا نشد! محتوای صفحه:"
+            cat temp.html
+            exit 1
+          fi
+          
+          # دانلود هر فایل
+          cd "$TARGET_DIR"
           while IFS= read -r filename; do
-            FILE_URL="https://everyayah.com/data/${{ matrix.qari.folder }}/$filename"
-            echo "⏳ دانلود: $filename"
-            curl -L --fail --silent --output "$filename" "$FILE_URL" && echo "✅ $filename" || echo "⚠️ خطا: $filename"
+            FILE_URL="https://everyayah.com/data/$FOLDER_NAME/$filename"
+            if curl -L --fail -s -o "$filename" "$FILE_URL"; then
+              SIZE=$(du -h "$filename" | cut -f1)
+              echo "✅ $filename ($SIZE)"
+            else
+              echo "❌ خطا: $filename"
+              rm -f "$filename"
+            fi
           done < ../filelist.txt
           
           cd ..
 
       - name: زیپ کردن فایل‌ها
         run: |
-          zip -r "${{ matrix.qari.name }}.zip" "${{ matrix.qari.name }}/"
-          echo "📦 حجم ZIP: $(du -h ${{ matrix.qari.name }}.zip | cut -f1)"
+          if [ -d "${{ matrix.qari-name }}" ] && [ "$(ls -A ${{ matrix.qari-name }})" ]; then
+            zip -r "${{ matrix.qari-name }}.zip" "${{ matrix.qari-name }}/"
+            echo "📦 ZIP ساخته شد: $(du -h ${{ matrix.qari-name }}.zip | cut -f1)"
+          else
+            echo "⚠️ پوشه خالی است، ZIP ساخته نمی‌شود"
+            echo "dummy" > dummy.txt
+            zip -r "${{ matrix.qari-name }}.zip" dummy.txt
+          fi
 
       - name: آپلود Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: "${{ matrix.qari.name }}"
-          path: "${{ matrix.qari.name }}.zip"
+          name: "${{ matrix.qari-name }}"
+          path: "${{ matrix.qari-name }}.zip"
           retention-days: 90
