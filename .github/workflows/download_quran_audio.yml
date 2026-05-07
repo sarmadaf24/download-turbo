@@ -11,7 +11,8 @@ jobs:
             curl -L -o "Surah_${s}.zip" "https://everyayah.com/data/Abdul_Basit_Mujawwad_128kbps/zips/${s}.zip"
             echo "✅ سوره $s"
           done
-      - run: zip -r "../Abdul_Basit_Mujawwad_128kbps.zip" .
+          cd ..
+      - run: zip -r "Abdul_Basit_Mujawwad_128kbps.zip" "Abdul_Basit_Mujawwad_128kbps"
       - uses: actions/upload-artifact@v4
         with:
           name: "Abdul_Basit_Mujawwad_128kbps"
