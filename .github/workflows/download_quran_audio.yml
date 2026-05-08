@@ -1,28 +1,49 @@
-name: Get Quran Phonetic Files
+name: Get ALL Quran Resources
 
 on:
   workflow_dispatch:
 
 jobs:
-  download:
+  download_everything:
     runs-on: ubuntu-latest
     steps:
-      - run: |
-          mkdir quran_data
-          cd quran_data
-          
-          # فقط فایل buckwalter (حاوی تلفظ)
-          curl -L -o buckwalter.txt "https://raw.githubusercontent.com/quranicdata/quranic-corpus/master/data/buckwalter.txt"
-          
-          # فایل quran-simple (متن ساده)
-          curl -L -o quran-simple.txt "https://raw.githubusercontent.com/quranicdata/quranic-corpus/master/data/quran-simple.txt"
-          
-          # فایل mappings (برای تبدیل به MFA)
-          curl -L -o mapping.txt "https://raw.githubusercontent.com/quranicdata/quranic-corpus/master/data/mapping-buckwalter.txt"
-          
-          ls -la
-          
-      - uses: actions/upload-artifact@v4
+      - name: Create directories
+        run: mkdir -p quran_resources/{phonetic,morphology,audio,translation}
+
+      - name: Get Phonetic (Buckwalter)
+        run: |
+          curl -L -o quran_resources/phonetic/buckwalter.txt "https://raw.githubusercontent.com/quranicdata/quranic-corpus/master/data/buckwalter.txt"
+          curl -L -o quran_resources/phonetic/quran-simple.txt "https://raw.githubusercontent.com/quranicdata/quranic-corpus/master/data/quran-simple.txt"
+          curl -L -o quran_resources/phonetic/arabic.xml "https://raw.githubusercontent.com/quranicdata/quranic-corpus/master/data/arabic.xml"
+
+      - name: Get Morphology (complete)
+        run: |
+          curl -L -o quran_resources/morphology/morphology.txt "https://raw.githubusercontent.com/quranicdata/quranic-corpus/master/data/morphology.txt"
+          curl -L -o quran_resources/morphology/roots.txt "https://raw.githubusercontent.com/quranicdata/quranic-corpus/master/data/roots.txt"
+
+      - name: Get Translations (English, Russian, Tajik, Turkish)
+        run: |
+          curl -L -o quran_resources/translation/en_sahih.json "https://raw.githubusercontent.com/fawazahmed0/quran-api/main/editions/eng-sahih.json"
+          curl -L -o quran_resources/translation/ru.json "https://raw.githubusercontent.com/fawazahmed0/quran-api/main/editions/rus-kuliev.json"
+          curl -L -o quran_resources/translation/tr.json "https://raw.githubusercontent.com/fawazahmed0/quran-api/main/editions/tur-yazir.json"
+          curl -L -o quran_resources/translation/tg.json "https://raw.githubusercontent.com/fawazahmed0/quran-api/main/editions/tgk-oyati.json"
+
+      - name: Get Word-by-Word data
+        run: |
+          curl -L -o quran_resources/morphology/wordbyword.json "https://raw.githubusercontent.com/quranicdata/quranic-corpus/master/data/wordbyword.json"
+
+      - name: Get MFA specific
+        run: |
+          curl -L -o quran_resources/phonetic/mfa_phones.txt "https://raw.githubusercontent.com/MontrealCorpusTools/mfa-models/main/phonetic/arabic_mfa/arabic_mfa.txt"
+
+      - name: List all files
+        run: |
+          echo "=== ALL DOWNLOADED FILES ==="
+          find quran_resources -type f | sort
+
+      - name: Upload everything
+        uses: actions/upload-artifact@v4
         with:
-          name: quran-phonetic-files
-          path: quran_data/
+          name: quran-complete-resources
+          path: quran_resources/
+          retention-days: 30
