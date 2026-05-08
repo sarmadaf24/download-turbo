@@ -1,19 +1,30 @@
-name: Abdul_Basit_Mujawwad_128kbps_Part2_Surahs_011-030
-on: workflow_dispatch
+name: Download Quran Phonetic Data
+
+on:
+  workflow_dispatch:  # فقط با دستور manual اجرا شود
+
 jobs:
   download:
     runs-on: ubuntu-latest
     steps:
-      - run: sudo apt-get update && sudo apt-get install -y zip curl
-      - run: |
-          mkdir -p "Abdul_Basit_Mujawwad_Part2" && cd "Abdul_Basit_Mujawwad_Part2"
-          for s in {011..030}; do
-            curl -L -o "Surah_${s}.zip" "https://everyayah.com/data/Abdul_Basit_Mujawwad_128kbps/zips/${s}.zip"
-            echo "✅ سوره $s"
-          done
-          cd ..
-      - run: zip -r "Abdul_Basit_Mujawwad_128kbps_Part2.zip" "Abdul_Basit_Mujawwad_Part2"
-      - uses: actions/upload-artifact@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Download from Mendeley
+        run: |
+          # دانلود فایل کوچک (فقط phonetic data)
+          wget https://data.mendeley.com/public-files/datasets/rk96pn66m4/files/xxx -O phonetic.zip
+          # سایز واقعی: حدود 3-5 مگابایت (نه 40 گیگ!)
+          # 40 گیگ مربوط به فایل‌های صوتی است، ما فقط به phonetic نیاز داریم
+      
+      - name: Extract phonetic data
+        run: |
+          unzip phonetic.zip
+          # فیلتر کردن فقط فایل‌های CSV مربوط به phonetic
+          find . -name "*phonetic*.csv" -exec cat {} \; > quran_phonetic.csv
+      
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
         with:
-          name: "Abdul_Basit_Mujawwad_128kbps_Part2"
-          path: "Abdul_Basit_Mujawwad_128kbps_Part2.zip"
+          name: quran-phonetic
+          path: quran_phonetic.csv
