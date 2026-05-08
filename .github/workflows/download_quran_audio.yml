@@ -1,30 +1,42 @@
-name: Download Quran Phonetic Data
+name: Get Quran Phonetic Data
 
 on:
-  workflow_dispatch:  # فقط با دستور manual اجرا شود
+  workflow_dispatch:  # فقط با دستور manual
 
 jobs:
-  download:
+  download_phonetic:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - run: sudo apt-get update && sudo apt-get install -y zip curl unzip
       
-      - name: Download from Mendeley
+      - name: Download Quran Phonetic from Quranic Corpus
         run: |
-          # دانلود فایل کوچک (فقط phonetic data)
-          wget https://data.mendeley.com/public-files/datasets/rk96pn66m4/files/xxx -O phonetic.zip
-          # سایز واقعی: حدود 3-5 مگابایت (نه 40 گیگ!)
-          # 40 گیگ مربوط به فایل‌های صوتی است، ما فقط به phonetic نیاز داریم
+          mkdir phonetic_data
+          cd phonetic_data
+          
+          # روش 1: از everyayah.com (همان منبع خودت)
+          # phonetic data در اینجا هست:
+          curl -L -o "quran_phonetic.zip" "https://raw.githubusercontent.com/quranicdata/quranic-corpus/master/data/phonetic.csv"
+          
+          # اگر لینک بالا کار نکرد، از بک‌آپ استفاده کن:
+          # curl -L -o "quran_phonetic.zip" "https://everyayah.com/data/Abdul_Basit_Mujawwad_128kbps/quran_data/phonetic.csv"
+          
+          cd ..
       
-      - name: Extract phonetic data
+      - name: Extract and Process
         run: |
-          unzip phonetic.zip
-          # فیلتر کردن فقط فایل‌های CSV مربوط به phonetic
-          find . -name "*phonetic*.csv" -exec cat {} \; > quran_phonetic.csv
+          if [ -f "phonetic_data/quran_phonetic.zip" ]; then
+            unzip phonetic_data/quran_phonetic.zip -d phonetic_data/
+            echo "✅ فایل phonetic دانلود شد"
+            ls -la phonetic_data/
+          else
+            echo "⚠️ لینک مستقیم کار نکرد، از روش جایگزین استفاده می‌کنیم"
+            # روش جایگزین: دانلود از Quran JSON API
+            curl -L -o "phonetic_data/quran_phonetic.json" "https://api.alquran.cloud/v1/quran/ar.phonetic"
+          fi
       
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: quran-phonetic
-          path: quran_phonetic.csv
+          name: quran-phonetic-data
+          path: phonetic_data/
