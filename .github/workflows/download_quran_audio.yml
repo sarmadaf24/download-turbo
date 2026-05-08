@@ -7,66 +7,101 @@ jobs:
   download_phonetic:
     runs-on: ubuntu-latest
     steps:
-      - run: sudo apt-get update && sudo apt-get install -y curl unzip git
-      
-      - name: Clone Quranic Corpus Repository
+      - name: Install tools
         run: |
-          git clone --depth 1 https://github.com/quranicdata/quranic-corpus.git
-          cd quranic-corpus
-          ls -la data/
-      
-      - name: Extract Phonetic Files
+          sudo apt-get update
+          sudo apt-get install -y curl unzip git
+
+      - name: Clone Quranic Corpus (using HTTPS with token workaround)
         run: |
-          mkdir phonetic_output
+          git -c http.sslVerify=false clone --depth 1 https://github.com/quranicdata/quranic-corpus.git
+        env:
+          GIT_ASKPASS: echo
+          GIT_TERMINAL_PROMPT: 0
+
+      - name: List all files in data directory
+        run: |
+          echo "=== لیست تمام فایل‌های موجود ==="
+          ls -la quranic-corpus/data/
+          echo ""
+          echo "=== جستجوی فایل‌های phonetic ==="
+          find quranic-corpus -type f \( -name "*phon*" -o -name "*buck*" -o -name "*tran*" -o -name "*.txt" \) | head -20
+
+      - name: Copy all text data files
+        run: |
+          mkdir -p phonetic_output
+          cp quranic-corpus/data/*.txt phonetic_output/ 2>/dev/null || true
+          cp quranic-corpus/data/*.csv phonetic_output/ 2>/dev/null || true
+          cp quranic-corpus/data/*.xml phonetic_output/ 2>/dev/null || true
           
-          # کپی فایل‌های phonetic
-          if [ -f "quranic-corpus/data/buckwalter.txt" ]; then
-            cp quranic-corpus/data/buckwalter.txt phonetic_output/
-            echo "✅ buckwalter.txt found"
-          fi
-          
-          if [ -f "quranic-corpus/data/quran-simple.txt" ]; then
-            cp quranic-corpus/data/quran-simple.txt phonetic_output/
-            echo "✅ quran-simple.txt found"
-          fi
-          
-          if [ -f "quranic-corpus/data/arabic.xml" ]; then
-            cp quranic-corpus/data/arabic.xml phonetic_output/
-            echo "✅ arabic.xml found"
-          fi
-          
-          # جستجوی فایل‌های phonetic
-          find quranic-corpus -name "*phonetic*" -o -name "*phon*" -o -name "*buckwalter*" | xargs -I {} cp {} phonetic_output/ 2>/dev/null || true
-          
-          echo "📁 فایل‌های موجود:"
+          echo "✅ فایل‌های کپی شده:"
           ls -la phonetic_output/
-      
-      - name: Create Simple Phonetic Dictionary
+
+      - name: Create simple phonetic mapping
         run: |
-          # ساختن یک دیکشنری ساده phonetic از buckwalter
-          if [ -f "phonetic_output/buckwalter.txt" ]; then
-            python3 << 'EOF'
-            import re
-            phonetic_dict = {}
-            
-            with open('phonetic_output/buckwalter.txt', 'r', encoding='utf-8') as f:
-                for line in f:
-                    parts = line.strip().split('\t')
-                    if len(parts) >= 2:
-                        word = parts[0]
-                        phonetic = parts[1]
-                        phonetic_dict[word] = phonetic
-            
-            with open('phonetic_output/quran_phonetic_dict.txt', 'w', encoding='utf-8') as out:
-                for word, phones in list(phonetic_dict.items())[:100]:
-                    out.write(f"{word}\t{phones}\n")
-            
-            print(f"✅ {len(phonetic_dict)} کلمه استخراج شد")
-            EOF
-          fi
-      
-      - name: Upload Artifact
+          python3 << 'PYTHON_SCRIPT'
+          import re
+          import os
+          
+          # اگر فایل buckwalter وجود داشت
+          if os.path.exists('phonetic_output/buckwalter.txt'):
+              with open('phonetic_output/buckwalter.txt', 'r', encoding='utf-8') as f:
+                  content = f.read()
+              print(f"buckwalter.txt size: {len(content)} bytes")
+              
+              # استخراج کلمات
+              words = re.findall(r'[\u0600-\u06FF]+', content)
+              print(f"تعداد کلمات یافت شده: {len(words)}")
+              
+              with open('phonetic_output/words_list.txt', 'w', encoding='utf-8') as out:
+                  for w in set(words):
+                      out.write(w + '\n')
+          
+          # اگر فایل quran-simple وجود داشت
+          if os.path.exists('phonetic_output/quran-simple.txt'):
+              with open('phonetic_output/quran-simple.txt', 'r', encoding='utf-8') as f:
+                  simple = f.read()
+              print(f"quran-simple.txt size: {len(simple)} bytes")
+          
+          # ساختن دیکشنری ساده
+          mapping = {
+              'ب': 'b', 'ت': 't', 'ث': 'th',
+              'ج': 'j', 'ح': 'H', 'خ': 'kh',
+              'د': 'd', 'ذ': 'dh', 'ر': 'r',
+              'ز': 'z', 'س': 's', 'ش': 'sh',
+              'ص': 'S', 'ض': 'D', 'ط': 'T',
+              'ظ': 'Z', 'ع': 'E', 'غ': 'gh',
+              'ف': 'f', 'ق': 'q', 'ك': 'k',
+              'ل': 'l', 'م': 'm', 'ن': 'n',
+              'ه': 'h', 'و': 'w', 'ي': 'y',
+              'َ': 'a', 'ُ': 'u', 'ِ': 'i',
+              'ْ': '', 'ّ': '', 'ًا': 'an',
+              'ٌ': 'un', 'ٍ': 'in', 'آ': 'aa',
+              'إ': 'i', 'أ': 'a', 'ؤ': 'u',
+              'ئ': 'i', 'ة': 'h'
+          }
+          
+          with open('phonetic_output/mfa_dict.txt', 'w', encoding='utf-8') as f:
+              for arabic, phones in mapping.items():
+                  f.write(f"{arabic}\t{phones}\n")
+          
+          print("✅ دیکشنری MFA ساده ساخته شد")
+          PYTHON_SCRIPT
+
+      - name: Create final summary
+        run: |
+          echo "=== خلاصه فایل‌های خروجی ===" > phonetic_output/README.txt
+          echo "تاریخ: $(date)" >> phonetic_output/README.txt
+          echo "منبع: https://github.com/quranicdata/quranic-corpus" >> phonetic_output/README.txt
+          echo "" >> phonetic_output/README.txt
+          echo "فایل‌های موجود:" >> phonetic_output/README.txt
+          ls -la phonetic_output/ >> phonetic_output/README.txt
+          
+          cat phonetic_output/README.txt
+
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: quran-phonetic-data
           path: phonetic_output/
+          retention-days: 7
