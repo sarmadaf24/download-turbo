@@ -1,4 +1,4 @@
-name: Get Quran Data
+name: Get Quran Phonetic Files
 
 on:
   workflow_dispatch:
@@ -7,20 +7,22 @@ jobs:
   download:
     runs-on: ubuntu-latest
     steps:
-      - name: Clone Quran Data Repository
-        run: |
-          git clone --depth 1 https://github.com/fawazahmed0/quran-api.git
-          git clone --depth 1 https://github.com/semarketir/quranjson.git
-
-      - name: Copy data files
-        run: |
-          mkdir output
-          find . -name "*.json" -exec cp {} output/ \; 2>/dev/null || true
-          find . -name "*.txt" -exec cp {} output/ \; 2>/dev/null || true
-          ls -la output/
-
-      - name: Upload
-        uses: actions/upload-artifact@v4
+      - run: |
+          mkdir quran_data
+          cd quran_data
+          
+          # فقط فایل buckwalter (حاوی تلفظ)
+          curl -L -o buckwalter.txt "https://raw.githubusercontent.com/quranicdata/quranic-corpus/master/data/buckwalter.txt"
+          
+          # فایل quran-simple (متن ساده)
+          curl -L -o quran-simple.txt "https://raw.githubusercontent.com/quranicdata/quranic-corpus/master/data/quran-simple.txt"
+          
+          # فایل mappings (برای تبدیل به MFA)
+          curl -L -o mapping.txt "https://raw.githubusercontent.com/quranicdata/quranic-corpus/master/data/mapping-buckwalter.txt"
+          
+          ls -la
+          
+      - uses: actions/upload-artifact@v4
         with:
-          name: quran-data
-          path: output/
+          name: quran-phonetic-files
+          path: quran_data/
