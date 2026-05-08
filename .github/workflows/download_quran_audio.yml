@@ -1,4 +1,4 @@
-name: Abdul_Basit_Mujawwad_128kbps_Part1_Surahs_001-010
+name: Abdul_Basit_Mujawwad_128kbps_Part2_Surahs_011-030
 on: workflow_dispatch
 jobs:
   download:
@@ -6,14 +6,14 @@ jobs:
     steps:
       - run: sudo apt-get update && sudo apt-get install -y zip curl
       - run: |
-          mkdir -p "Abdul_Basit_Mujawwad_Part1" && cd "Abdul_Basit_Mujawwad_Part1"
-          for s in {001..010}; do
+          mkdir -p "Abdul_Basit_Mujawwad_Part2" && cd "Abdul_Basit_Mujawwad_Part2"
+          for s in {011..030}; do
             curl -L -o "Surah_${s}.zip" "https://everyayah.com/data/Abdul_Basit_Mujawwad_128kbps/zips/${s}.zip"
             echo "✅ سوره $s"
           done
           cd ..
-      - run: zip -r "Abdul_Basit_Mujawwad_128kbps_Part1.zip" "Abdul_Basit_Mujawwad_Part1"
+      - run: zip -r "Abdul_Basit_Mujawwad_128kbps_Part2.zip" "Abdul_Basit_Mujawwad_Part2"
       - uses: actions/upload-artifact@v4
         with:
-          name: "Abdul_Basit_Mujawwad_128kbps_Part1"
-          path: "Abdul_Basit_Mujawwad_128kbps_Part1.zip"
+          name: "Abdul_Basit_Mujawwad_128kbps_Part2"
+          path: "Abdul_Basit_Mujawwad_128kbps_Part2.zip"
