@@ -1,42 +1,72 @@
 name: Get Quran Phonetic Data
 
 on:
-  workflow_dispatch:  # فقط با دستور manual
+  workflow_dispatch:
 
 jobs:
   download_phonetic:
     runs-on: ubuntu-latest
     steps:
-      - run: sudo apt-get update && sudo apt-get install -y zip curl unzip
+      - run: sudo apt-get update && sudo apt-get install -y curl unzip git
       
-      - name: Download Quran Phonetic from Quranic Corpus
+      - name: Clone Quranic Corpus Repository
         run: |
-          mkdir phonetic_data
-          cd phonetic_data
-          
-          # روش 1: از everyayah.com (همان منبع خودت)
-          # phonetic data در اینجا هست:
-          curl -L -o "quran_phonetic.zip" "https://raw.githubusercontent.com/quranicdata/quranic-corpus/master/data/phonetic.csv"
-          
-          # اگر لینک بالا کار نکرد، از بک‌آپ استفاده کن:
-          # curl -L -o "quran_phonetic.zip" "https://everyayah.com/data/Abdul_Basit_Mujawwad_128kbps/quran_data/phonetic.csv"
-          
-          cd ..
+          git clone --depth 1 https://github.com/quranicdata/quranic-corpus.git
+          cd quranic-corpus
+          ls -la data/
       
-      - name: Extract and Process
+      - name: Extract Phonetic Files
         run: |
-          if [ -f "phonetic_data/quran_phonetic.zip" ]; then
-            unzip phonetic_data/quran_phonetic.zip -d phonetic_data/
-            echo "✅ فایل phonetic دانلود شد"
-            ls -la phonetic_data/
-          else
-            echo "⚠️ لینک مستقیم کار نکرد، از روش جایگزین استفاده می‌کنیم"
-            # روش جایگزین: دانلود از Quran JSON API
-            curl -L -o "phonetic_data/quran_phonetic.json" "https://api.alquran.cloud/v1/quran/ar.phonetic"
+          mkdir phonetic_output
+          
+          # کپی فایل‌های phonetic
+          if [ -f "quranic-corpus/data/buckwalter.txt" ]; then
+            cp quranic-corpus/data/buckwalter.txt phonetic_output/
+            echo "✅ buckwalter.txt found"
+          fi
+          
+          if [ -f "quranic-corpus/data/quran-simple.txt" ]; then
+            cp quranic-corpus/data/quran-simple.txt phonetic_output/
+            echo "✅ quran-simple.txt found"
+          fi
+          
+          if [ -f "quranic-corpus/data/arabic.xml" ]; then
+            cp quranic-corpus/data/arabic.xml phonetic_output/
+            echo "✅ arabic.xml found"
+          fi
+          
+          # جستجوی فایل‌های phonetic
+          find quranic-corpus -name "*phonetic*" -o -name "*phon*" -o -name "*buckwalter*" | xargs -I {} cp {} phonetic_output/ 2>/dev/null || true
+          
+          echo "📁 فایل‌های موجود:"
+          ls -la phonetic_output/
+      
+      - name: Create Simple Phonetic Dictionary
+        run: |
+          # ساختن یک دیکشنری ساده phonetic از buckwalter
+          if [ -f "phonetic_output/buckwalter.txt" ]; then
+            python3 << 'EOF'
+            import re
+            phonetic_dict = {}
+            
+            with open('phonetic_output/buckwalter.txt', 'r', encoding='utf-8') as f:
+                for line in f:
+                    parts = line.strip().split('\t')
+                    if len(parts) >= 2:
+                        word = parts[0]
+                        phonetic = parts[1]
+                        phonetic_dict[word] = phonetic
+            
+            with open('phonetic_output/quran_phonetic_dict.txt', 'w', encoding='utf-8') as out:
+                for word, phones in list(phonetic_dict.items())[:100]:
+                    out.write(f"{word}\t{phones}\n")
+            
+            print(f"✅ {len(phonetic_dict)} کلمه استخراج شد")
+            EOF
           fi
       
-      - name: Upload artifact
+      - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: quran-phonetic-data
-          path: phonetic_data/
+          path: phonetic_output/
