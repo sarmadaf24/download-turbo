@@ -1,4 +1,4 @@
-name: Get Quran Data
+name: Get Quran Data from Mendeley
 
 on:
   workflow_dispatch:
@@ -7,17 +7,16 @@ jobs:
   download:
     runs-on: ubuntu-latest
     steps:
-      - run: |
+      - name: Download Quran dataset from Mendeley
+        run: |
           mkdir quran_data
           cd quran_data
-          
-          curl -L -o buckwalter.txt "https://raw.githubusercontent.com/quranicdata/quranic-corpus/master/data/buckwalter.txt"
-          curl -L -o wordbyword.txt "https://raw.githubusercontent.com/mustafa0x/quran-morphology/master/data/quran-morphology-0.4.txt"
-          curl -L -o mfa_phones.txt "https://raw.githubusercontent.com/MontrealCorpusTools/mfa-models/main/phonetic/arabic_mfa/arabic_mfa.txt"
-          
+          curl -L -o quran_dataset.zip "https://data.mendeley.com/public-files/datasets/rk96pn66m4/files/XXX"
+          unzip quran_dataset.zip
           ls -la
           
-      - uses: actions/upload-artifact@v4
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
         with:
-          name: quran-data
+          name: quran-complete-data
           path: quran_data/
