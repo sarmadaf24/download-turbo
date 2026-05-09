@@ -1,4 +1,4 @@
-name: 02-Download-Quran-Cloud-Fixed
+name: 03-Fetch-Word-by-Word-Translations
 on: workflow_dispatch
 jobs:
   download:
@@ -6,58 +6,53 @@ jobs:
     steps:
       - run: sudo apt-get update && sudo apt-get install -y zip curl jq
       
-      - name: Download Quran Cloud Package
+      - name: Download Word-by-Word Data (English, Persian, Urdu, etc.)
         run: |
-          mkdir -p "Quran_Cloud_NPM_Dataset"
-          cd "Quran_Cloud_NPM_Dataset"
+          mkdir -p "WordByWord_Data"
+          cd "WordByWord_Data"
           
-          # روش 1: دانلود مستقیم از unpkg (CDN رسمی npm)
-          echo "📦 دانلود پکیج اصلی..."
-          curl -L -o "package.json" "https://unpkg.com/quran-cloud@latest/package.json"
+          # منبع فوق العاده: بیش از 90 زبان و 440 ترجمه در قالب Word-by-Word
+          # مستندات: https://github.com/fawazahmed0/quran-api
           
-          # دانلود فایل اصلی قرآن (شامل metadata سوره‌ها)
-          curl -L -o "quran.json" "https://unpkg.com/quran-cloud@latest/dist/quran.json"
+          # --- فهرست زبان‌های Word-by-Word ---
+          # en_rwwad (English - Ruwwad)
+          # fa_makarem (فارسی - مکارم شیرازی)
+          # ur_ahmedali (Urdu - Ahmed Ali)
+          # id_mubarok (Indonesia - Mubarok)
+          # tr_yazir (Turkish - Yazir)
+          # ru_kuliev (Russian - Kuliev)
           
-          # دانلود فایل word-by-word برای زبان انگلیسی (کاملترین)
-          echo "📖 دانلود ترجمه کلمه به کلمه انگلیسی..."
-          curl -L -o "en_word_by_word.json" "https://unpkg.com/quran-cloud@latest/dist/en.json"
-          
-          # دانلود برای سایر زبان‌های موجود
-          for lang in bn zh es fr id ru sv tr ur; do
-            echo "🌍 دانلود برای زبان: $lang"
-            curl -L -o "${lang}_translation.json" "https://unpkg.com/quran-cloud@latest/dist/${lang}.json" 2>/dev/null || echo "⚠️ زبان $lang موجود نیست"
+          for edition in en_rwwad fa_makarem ur_ahmedali id_mubarok tr_yazir; do
+            echo "دریافت Word-by-Word برای: $edition"
+            curl -L -o "word_by_word_${edition}.json" \
+              "https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/editions/${edition}.json"
           done
           
-          # روش 2: اگر پکیج کامل می‌خواهید، کل محتوا را از npm دانلود کنید
-          echo "📚 دانلود کل پکیج با npm pack..."
-          npm pack quran-cloud@latest
+          # همچنین متن اصلی عربی را با جزئیات کلمات (برای تطابق) دریافت کن
+          echo "دریافت متن اصلی عربی word-by-word..."
+          curl -L -o "arabic_words.json" \
+            "https://raw.githubusercontent.com/fawazahmed0/quran-api/refs/heads/main/editions/ar-lt.json"
           
-          # استخراج فایل‌های داخل پکیج
-          if ls quran-cloud-*.tgz 1> /dev/null 2>&1; then
-            tar -xzf quran-cloud-*.tgz
-            cp -r package/* . 2>/dev/null || true
-          fi
-          
-          echo "✅ دانلود کامل شد. لیست فایل‌ها:"
+          echo "✅ تمام فایل‌های Word-by-Word دریافت شدند."
           ls -la
           
-      - name: Create detailed word-by-word data
+      - name: Create a clean CSV sample
         run: |
-          cd "Quran_Cloud_NPM_Dataset"
+          cd "WordByWord_Data"
+          # نمونه ساده: استخراج سوره اول، آیه اول به صورت CSV (اختیاری)
+          echo "Surah,Ayah,Word,Meaning" > sample_word_by_word.csv
+          cat word_by_word_en_rwwad.json | jq -r '
+            .[] | 
+            .[] | 
+            .[] | 
+            {surah: .surah, ayah: .ayah, word: .word, meaning: .meaning} |
+            [.surah, .ayah, .word, .meaning] | @csv
+          ' >> sample_word_by_word.csv 2>/dev/null || echo "CSV sample could not be generated"
           
-          # اگر فایل انگلیسی موجود است، آن را به فرمت ساده‌تر تبدیل کن
-          if [ -f "en.json" ]; then
-            echo "🔄 پردازش داده‌های کلمه به کلمه..."
-            # استخراج اطلاعات هر کلمه از فایل JSON (اختیاری)
-            cat en.json | jq '.[] | {surah, ayah, text, translation}' > word_by_word_sample.json 2>/dev/null || echo "⚠️ پردازش jq ممکن نیست"
-          fi
-          
-      - run: |
-          cd "Quran_Cloud_NPM_Dataset"
-          zip -r "../Quran_Cloud_NPM_Dataset.zip" .
-          cd ..
-          
+      - name: Compress Data
+        run: zip -r "WordByWord_Complete.zip" "WordByWord_Data"
+        
       - uses: actions/upload-artifact@v4
         with:
-          name: "02-Quran-Cloud-NPM"
-          path: "Quran_Cloud_NPM_Dataset.zip"
+          name: "03-WordByWord-Translations"
+          path: "WordByWord_Complete.zip"
