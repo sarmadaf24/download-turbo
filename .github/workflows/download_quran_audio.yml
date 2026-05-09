@@ -1,29 +1,24 @@
-name: 01-Download-Quran-Kuddari
+name: 01-Download-Quran-Kuddari-Fixed
 on: workflow_dispatch
 jobs:
   download:
     runs-on: ubuntu-latest
     steps:
-      - run: sudo apt-get update && sudo apt-get install -y zip curl
-      - run: |
-          mkdir -p "Quran_Kuddari_Dataset"
-          cd "Quran_Kuddari_Dataset"
-          # فایل‌های اصلی که شامل ترجمه کلمه به کلمه هستند (Word.csv, en_word.csv)
-          curl -L -o "word_by_word_arabic.csv" "https://raw.githubusercontent.com/Kuddari/Quran_analysis_with_python/main/Word.csv"
-          curl -L -o "word_by_word_english.csv" "https://raw.githubusercontent.com/Kuddari/Quran_analysis_with_python/main/en_word.csv"
-          curl -L -o "word_by_word_indonesian.csv" "https://raw.githubusercontent.com/Kuddari/Quran_analysis_with_python/main/id_word.csv"
-          # سایر فایل‌های مفید (ترجمه‌ها، سوره‌ها، و ...)
-          curl -L -o "en_translation.csv" "https://raw.githubusercontent.com/Kuddari/Quran_analysis_with_python/main/en_translate.csv"
-          curl -L -o "chinese_translation.csv" "https://raw.githubusercontent.com/Kuddari/Quran_analysis_with_python/main/Chinese_translate.csv"
-          curl -L -o "thai_translation.csv" "https://raw.githubusercontent.com/Kuddari/Quran_analysis_with_python/main/thai_translate.csv"
-          curl -L -o "cambodian_translation.csv" "https://raw.githubusercontent.com/Kuddari/Quran_analysis_with_python/main/cambodia_translate.csv"
-          curl -L -o "indonesian_translation.csv" "https://raw.githubusercontent.com/Kuddari/Quran_analysis_with_python/main/id_translate.csv"
-          curl -L -o "malay_translation.csv" "https://raw.githubusercontent.com/Kuddari/Quran_analysis_with_python/main/malay_translate.csv"
-          curl -L -o "surahs_english.csv" "https://raw.githubusercontent.com/Kuddari/Quran_analysis_with_python/main/en_surah.csv"
-          curl -L -o "tafsir_english.md" "https://raw.githubusercontent.com/Kuddari/Quran_analysis_with_python/main/en-mukhtasar-islamhouse.md"
-          echo "✅ دانلود تمام فایل‌های Kuddari انجام شد"
-      - run: zip -r "Quran_Kuddari_Dataset.zip" "Quran_Kuddari_Dataset"
-      - uses: actions/upload-artifact@v4
+      - name: Install git and zip
+        run: sudo apt-get update && sudo apt-get install -y git zip
+
+      - name: Clone repository
+        run: |
+          git clone https://github.com/Kuddari/Quran_analysis_with_python.git Quran_Kuddari_Dataset
+          cd Quran_Kuddari_Dataset
+          # نمایش لیست فایل‌ها برای اطمینان (اختیاری)
+          ls -la
+
+      - name: Compress folder
+        run: zip -r "Quran_Kuddari_Dataset.zip" "Quran_Kuddari_Dataset"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
         with:
           name: "01-Quran-Database-Kuddari"
           path: "Quran_Kuddari_Dataset.zip"
