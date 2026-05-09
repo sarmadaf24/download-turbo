@@ -1,24 +1,63 @@
-name: 01-Download-Quran-Kuddari-Fixed
+name: 02-Download-Quran-Cloud-Fixed
 on: workflow_dispatch
 jobs:
   download:
     runs-on: ubuntu-latest
     steps:
-      - name: Install git and zip
-        run: sudo apt-get update && sudo apt-get install -y git zip
-
-      - name: Clone repository
+      - run: sudo apt-get update && sudo apt-get install -y zip curl jq
+      
+      - name: Download Quran Cloud Package
         run: |
-          git clone https://github.com/Kuddari/Quran_analysis_with_python.git Quran_Kuddari_Dataset
-          cd Quran_Kuddari_Dataset
-          # نمایش لیست فایل‌ها برای اطمینان (اختیاری)
+          mkdir -p "Quran_Cloud_NPM_Dataset"
+          cd "Quran_Cloud_NPM_Dataset"
+          
+          # روش 1: دانلود مستقیم از unpkg (CDN رسمی npm)
+          echo "📦 دانلود پکیج اصلی..."
+          curl -L -o "package.json" "https://unpkg.com/quran-cloud@latest/package.json"
+          
+          # دانلود فایل اصلی قرآن (شامل metadata سوره‌ها)
+          curl -L -o "quran.json" "https://unpkg.com/quran-cloud@latest/dist/quran.json"
+          
+          # دانلود فایل word-by-word برای زبان انگلیسی (کاملترین)
+          echo "📖 دانلود ترجمه کلمه به کلمه انگلیسی..."
+          curl -L -o "en_word_by_word.json" "https://unpkg.com/quran-cloud@latest/dist/en.json"
+          
+          # دانلود برای سایر زبان‌های موجود
+          for lang in bn zh es fr id ru sv tr ur; do
+            echo "🌍 دانلود برای زبان: $lang"
+            curl -L -o "${lang}_translation.json" "https://unpkg.com/quran-cloud@latest/dist/${lang}.json" 2>/dev/null || echo "⚠️ زبان $lang موجود نیست"
+          done
+          
+          # روش 2: اگر پکیج کامل می‌خواهید، کل محتوا را از npm دانلود کنید
+          echo "📚 دانلود کل پکیج با npm pack..."
+          npm pack quran-cloud@latest
+          
+          # استخراج فایل‌های داخل پکیج
+          if ls quran-cloud-*.tgz 1> /dev/null 2>&1; then
+            tar -xzf quran-cloud-*.tgz
+            cp -r package/* . 2>/dev/null || true
+          fi
+          
+          echo "✅ دانلود کامل شد. لیست فایل‌ها:"
           ls -la
-
-      - name: Compress folder
-        run: zip -r "Quran_Kuddari_Dataset.zip" "Quran_Kuddari_Dataset"
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
+          
+      - name: Create detailed word-by-word data
+        run: |
+          cd "Quran_Cloud_NPM_Dataset"
+          
+          # اگر فایل انگلیسی موجود است، آن را به فرمت ساده‌تر تبدیل کن
+          if [ -f "en.json" ]; then
+            echo "🔄 پردازش داده‌های کلمه به کلمه..."
+            # استخراج اطلاعات هر کلمه از فایل JSON (اختیاری)
+            cat en.json | jq '.[] | {surah, ayah, text, translation}' > word_by_word_sample.json 2>/dev/null || echo "⚠️ پردازش jq ممکن نیست"
+          fi
+          
+      - run: |
+          cd "Quran_Cloud_NPM_Dataset"
+          zip -r "../Quran_Cloud_NPM_Dataset.zip" .
+          cd ..
+          
+      - uses: actions/upload-artifact@v4
         with:
-          name: "01-Quran-Database-Kuddari"
-          path: "Quran_Kuddari_Dataset.zip"
+          name: "02-Quran-Cloud-NPM"
+          path: "Quran_Cloud_NPM_Dataset.zip"
