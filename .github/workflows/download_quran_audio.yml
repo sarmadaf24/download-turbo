@@ -1,58 +1,46 @@
-name: 03-Fetch-Word-by-Word-Translations
+name: 04-Full-Quran-API-fawazahmed0
 on: workflow_dispatch
 jobs:
   download:
     runs-on: ubuntu-latest
     steps:
-      - run: sudo apt-get update && sudo apt-get install -y zip curl jq
-      
-      - name: Download Word-by-Word Data (English, Persian, Urdu, etc.)
+      - name: Install git and zip
+        run: sudo apt-get update && sudo apt-get install -y git zip
+
+      - name: Clone full repository (includes ALL word-by-word translations)
         run: |
-          mkdir -p "WordByWord_Data"
-          cd "WordByWord_Data"
-          
-          # منبع فوق العاده: بیش از 90 زبان و 440 ترجمه در قالب Word-by-Word
-          # مستندات: https://github.com/fawazahmed0/quran-api
-          
-          # --- فهرست زبان‌های Word-by-Word ---
-          # en_rwwad (English - Ruwwad)
-          # fa_makarem (فارسی - مکارم شیرازی)
-          # ur_ahmedali (Urdu - Ahmed Ali)
-          # id_mubarok (Indonesia - Mubarok)
-          # tr_yazir (Turkish - Yazir)
-          # ru_kuliev (Russian - Kuliev)
-          
-          for edition in en_rwwad fa_makarem ur_ahmedali id_mubarok tr_yazir; do
-            echo "دریافت Word-by-Word برای: $edition"
-            curl -L -o "word_by_word_${edition}.json" \
-              "https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/editions/${edition}.json"
-          done
-          
-          # همچنین متن اصلی عربی را با جزئیات کلمات (برای تطابق) دریافت کن
-          echo "دریافت متن اصلی عربی word-by-word..."
-          curl -L -o "arabic_words.json" \
-            "https://raw.githubusercontent.com/fawazahmed0/quran-api/refs/heads/main/editions/ar-lt.json"
-          
-          echo "✅ تمام فایل‌های Word-by-Word دریافت شدند."
+          git clone https://github.com/fawazahmed0/quran-api.git Quran_API_Complete
+          cd Quran_API_Complete
+          echo "📁 کل ریپازیتوری clone شد. حجم تقریبی:"
+          du -sh .
+          echo ""
+          echo "📂 لیست پوشه‌ها:"
           ls -la
-          
-      - name: Create a clean CSV sample
+
+      - name: Show word-by-word files location
         run: |
-          cd "WordByWord_Data"
-          # نمونه ساده: استخراج سوره اول، آیه اول به صورت CSV (اختیاری)
-          echo "Surah,Ayah,Word,Meaning" > sample_word_by_word.csv
-          cat word_by_word_en_rwwad.json | jq -r '
-            .[] | 
-            .[] | 
-            .[] | 
-            {surah: .surah, ayah: .ayah, word: .word, meaning: .meaning} |
-            [.surah, .ayah, .word, .meaning] | @csv
-          ' >> sample_word_by_word.csv 2>/dev/null || echo "CSV sample could not be generated"
-          
-      - name: Compress Data
-        run: zip -r "WordByWord_Complete.zip" "WordByWord_Data"
-        
-      - uses: actions/upload-artifact@v4
+          cd Quran_API_Complete
+          echo "🔍 جستجوی فایل‌های word-by-word..."
+          echo ""
+          echo "✅ فایل‌های word-by-word در پوشه 'editions' قرار دارند:"
+          ls editions/ | grep -E "(word|en_|fa_|ur_|id_|tr_|ru_|es_|fr_|bn_|zh_)" | head -20
+          echo ""
+          echo "📊 تعداد کل فایل‌های word-by-word:"
+          find editions/ -name "*.json" | wc -l
+
+      - name: Create a list of all word-by-word files
+        run: |
+          cd Quran_API_Complete
+          echo "فهرست کامل فایل‌های word-by-word:" > word_by_word_filelist.txt
+          find editions/ -name "*.json" | grep -v "/ar-" >> word_by_word_filelist.txt
+          echo "" >> word_by_word_filelist.txt
+          echo "✅ دانلود کامل شد. این ریپازیتوری شامل ترجمه word-by-word به بیش از 90 زبان است." >> word_by_word_filelist.txt
+
+      - name: Compress everything
+        run: zip -r "Quran_API_Complete.zip" "Quran_API_Complete"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
         with:
-          name: "03-WordByWord-Translations"
-          path: "WordByWord_Complete.zip"
+          name: "04-Quran-API-fawazahmed0-Complete"
+          path: "Quran_API_Complete.zip"
