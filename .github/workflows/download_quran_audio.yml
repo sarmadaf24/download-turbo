@@ -1,22 +1,29 @@
-name: Get Quran Data from Mendeley
-
-on:
-  workflow_dispatch:
-
+name: 01-Download-Quran-Kuddari
+on: workflow_dispatch
 jobs:
   download:
     runs-on: ubuntu-latest
     steps:
-      - name: Download Quran dataset from Mendeley
-        run: |
-          mkdir quran_data
-          cd quran_data
-          curl -L -o quran_dataset.zip "https://data.mendeley.com/public-files/datasets/rk96pn66m4/files/XXX"
-          unzip quran_dataset.zip
-          ls -la
-          
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
+      - run: sudo apt-get update && sudo apt-get install -y zip curl
+      - run: |
+          mkdir -p "Quran_Kuddari_Dataset"
+          cd "Quran_Kuddari_Dataset"
+          # فایل‌های اصلی که شامل ترجمه کلمه به کلمه هستند (Word.csv, en_word.csv)
+          curl -L -o "word_by_word_arabic.csv" "https://raw.githubusercontent.com/Kuddari/Quran_analysis_with_python/main/Word.csv"
+          curl -L -o "word_by_word_english.csv" "https://raw.githubusercontent.com/Kuddari/Quran_analysis_with_python/main/en_word.csv"
+          curl -L -o "word_by_word_indonesian.csv" "https://raw.githubusercontent.com/Kuddari/Quran_analysis_with_python/main/id_word.csv"
+          # سایر فایل‌های مفید (ترجمه‌ها، سوره‌ها، و ...)
+          curl -L -o "en_translation.csv" "https://raw.githubusercontent.com/Kuddari/Quran_analysis_with_python/main/en_translate.csv"
+          curl -L -o "chinese_translation.csv" "https://raw.githubusercontent.com/Kuddari/Quran_analysis_with_python/main/Chinese_translate.csv"
+          curl -L -o "thai_translation.csv" "https://raw.githubusercontent.com/Kuddari/Quran_analysis_with_python/main/thai_translate.csv"
+          curl -L -o "cambodian_translation.csv" "https://raw.githubusercontent.com/Kuddari/Quran_analysis_with_python/main/cambodia_translate.csv"
+          curl -L -o "indonesian_translation.csv" "https://raw.githubusercontent.com/Kuddari/Quran_analysis_with_python/main/id_translate.csv"
+          curl -L -o "malay_translation.csv" "https://raw.githubusercontent.com/Kuddari/Quran_analysis_with_python/main/malay_translate.csv"
+          curl -L -o "surahs_english.csv" "https://raw.githubusercontent.com/Kuddari/Quran_analysis_with_python/main/en_surah.csv"
+          curl -L -o "tafsir_english.md" "https://raw.githubusercontent.com/Kuddari/Quran_analysis_with_python/main/en-mukhtasar-islamhouse.md"
+          echo "✅ دانلود تمام فایل‌های Kuddari انجام شد"
+      - run: zip -r "Quran_Kuddari_Dataset.zip" "Quran_Kuddari_Dataset"
+      - uses: actions/upload-artifact@v4
         with:
-          name: quran-complete-data
-          path: quran_data/
+          name: "01-Quran-Database-Kuddari"
+          path: "Quran_Kuddari_Dataset.zip"
