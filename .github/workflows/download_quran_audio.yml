@@ -1,46 +1,173 @@
-name: 04-Full-Quran-API-fawazahmed0
+name: 08-Separate-Artifacts-500MB
 on: workflow_dispatch
 jobs:
   download:
     runs-on: ubuntu-latest
     steps:
-      - name: Install git and zip
+      - name: Install tools
         run: sudo apt-get update && sudo apt-get install -y git zip
 
-      - name: Clone full repository (includes ALL word-by-word translations)
+      - name: Clone full repository
         run: |
           git clone https://github.com/fawazahmed0/quran-api.git Quran_API_Complete
           cd Quran_API_Complete
-          echo "📁 کل ریپازیتوری clone شد. حجم تقریبی:"
-          du -sh .
-          echo ""
-          echo "📂 لیست پوشه‌ها:"
-          ls -la
+          echo "✅ Clone کامل انجام شد"
 
-      - name: Show word-by-word files location
+      - name: Compress full repository
         run: |
-          cd Quran_API_Complete
-          echo "🔍 جستجوی فایل‌های word-by-word..."
-          echo ""
-          echo "✅ فایل‌های word-by-word در پوشه 'editions' قرار دارند:"
-          ls editions/ | grep -E "(word|en_|fa_|ur_|id_|tr_|ru_|es_|fr_|bn_|zh_)" | head -20
-          echo ""
-          echo "📊 تعداد کل فایل‌های word-by-word:"
-          find editions/ -name "*.json" | wc -l
+          zip -r "Quran_API_Complete.zip" "Quran_API_Complete"
+          echo "✅ فشرده‌سازی انجام شد"
+          ls -lh Quran_API_Complete.zip
 
-      - name: Create a list of all word-by-word files
+      - name: Split into 500MB parts
         run: |
-          cd Quran_API_Complete
-          echo "فهرست کامل فایل‌های word-by-word:" > word_by_word_filelist.txt
-          find editions/ -name "*.json" | grep -v "/ar-" >> word_by_word_filelist.txt
-          echo "" >> word_by_word_filelist.txt
-          echo "✅ دانلود کامل شد. این ریپازیتوری شامل ترجمه word-by-word به بیش از 90 زبان است." >> word_by_word_filelist.txt
+          mkdir parts
+          # تقسیم فایل به پارت‌های 500 مگابایتی با نام‌های مشخص
+          split -b 500m "Quran_API_Complete.zip" "parts/part_"
+          echo "✅ تقسیم به پارت‌های 500MB انجام شد"
+          ls -lh parts/
 
-      - name: Compress everything
-        run: zip -r "Quran_API_Complete.zip" "Quran_API_Complete"
+      - name: Upload each part as separate artifact
+        run: |
+          cd parts
+          for part in part_*; do
+            # استخراج شماره پارت (aa, ab, ac, ...)
+            part_num="${part#part_}"
+            echo "🔄 آپلود پارت ${part_num}..."
+          done
+        shell: bash
 
-      - name: Upload artifact
+      - name: Upload part_aa
         uses: actions/upload-artifact@v4
         with:
-          name: "04-Quran-API-fawazahmed0-Complete"
-          path: "Quran_API_Complete.zip"
+          name: "part_aa"
+          path: "parts/part_aa"
+
+      - name: Upload part_ab
+        uses: actions/upload-artifact@v4
+        with:
+          name: "part_ab"
+          path: "parts/part_ab"
+
+      - name: Upload part_ac
+        uses: actions/upload-artifact@v4
+        with:
+          name: "part_ac"
+          path: "parts/part_ac"
+
+      - name: Upload part_ad
+        uses: actions/upload-artifact@v4
+        with:
+          name: "part_ad"
+          path: "parts/part_ad"
+
+      - name: Upload part_ae
+        uses: actions/upload-artifact@v4
+        with:
+          name: "part_ae"
+          path: "parts/part_ae"
+
+      - name: Upload part_af
+        uses: actions/upload-artifact@v4
+        with:
+          name: "part_af"
+          path: "parts/part_af"
+
+      - name: Upload part_ag
+        uses: actions/upload-artifact@v4
+        with:
+          name: "part_ag"
+          path: "parts/part_ag"
+
+      - name: Upload part_ah
+        uses: actions/upload-artifact@v4
+        with:
+          name: "part_ah"
+          path: "parts/part_ah"
+
+      - name: Upload part_ai
+        uses: actions/upload-artifact@v4
+        with:
+          name: "part_ai"
+          path: "parts/part_ai"
+
+      - name: Upload part_aj
+        uses: actions/upload-artifact@v4
+        with:
+          name: "part_aj"
+          path: "parts/part_aj"
+
+      - name: Upload part_ak
+        uses: actions/upload-artifact@v4
+        with:
+          name: "part_ak"
+          path: "parts/part_ak"
+
+      - name: Upload part_al
+        uses: actions/upload-artifact@v4
+        with:
+          name: "part_al"
+          path: "parts/part_al"
+
+      - name: Upload part_am
+        uses: actions/upload-artifact@v4
+        with:
+          name: "part_am"
+          path: "parts/part_am"
+
+      - name: Upload part_an
+        uses: actions/upload-artifact@v4
+        with:
+          name: "part_an"
+          path: "parts/part_an"
+
+      - name: Upload part_ao
+        uses: actions/upload-artifact@v4
+        with:
+          name: "part_ao"
+          path: "parts/part_ao"
+
+      - name: Upload part_ap
+        uses: actions/upload-artifact@v4
+        with:
+          name: "part_ap"
+          path: "parts/part_ap"
+
+      - name: Upload part_aq
+        uses: actions/upload-artifact@v4
+        with:
+          name: "part_aq"
+          path: "parts/part_aq"
+
+      - name: Upload part_ar
+        uses: actions/upload-artifact@v4
+        with:
+          name: "part_ar"
+          path: "parts/part_ar"
+
+      - name: Create reassembly instructions
+        run: |
+          cat > reassemble_instructions.txt << 'EOF'
+          ===========================================
+          راهنمای چیدن پارت‌ها
+          ===========================================
+
+          ۱. همه فایل‌های part_* را دانلود کنید (هر کدام یک Artifact مجزا)
+          ۲. همه را در یک پوشه قرار دهید
+          ۳. در لینوکس/مک/گیت‌بش ویندوز اجرا کنید:
+             cat part_* > Quran_API_Complete.zip
+
+          ۴. در ویندوز CMD اجرا کنید:
+             copy /b part_* Quran_API_Complete.zip
+
+          ۵. فایل Quran_API_Complete.zip را اکسترکت کنید
+
+          ===========================================
+          EOF
+          cat reassemble_instructions.txt
+
+      - name: Upload instructions
+        uses: actions/upload-artifact@v4
+        with:
+          name: "reassembly_instructions"
+          path: "reassemble_instructions.txt"
